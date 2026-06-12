@@ -95,7 +95,6 @@ class encoder(torch.nn.Module):
         self.droput2 = torch.nn.Dropout(self.rate)
 
     def forward(self,x):
-
         attn_output = self.att(x) # MHSA
         attn_output = self.droput1(attn_output)
         out1 = self.layernorm1(x + attn_output)
@@ -353,9 +352,7 @@ class res3dViViT(torch.nn.Module):
         1) x: Input of shape [N,C,T,H,W]
 
         OUTPUTS:-
-        1) f_hgr: Softmax outputs of HGR network of shape (G,)
-        2) f_id: Softmax outputs of ID network of shape (I,)
-        3) f_theta: Final embeddings of shape (d_model,)
+        1) f_id: Softmax outputs of ID network of shape (I,)
         """
 
         ###### Res3D Backbone
@@ -399,7 +396,7 @@ class res3dViViT(torch.nn.Module):
         f_theta = torch.nn.functional.relu(self.dense_op(torch.mean(x,dim=1,keepdim=False))) # embeddings
         # dense_hgr = self.dense_hgr(f_theta)
         dense_id = self.dense_id(f_theta)
-        return dense_id
+        return dense_id, f_theta
 
 ###### Model summaries
 
