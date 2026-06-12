@@ -60,7 +60,7 @@ def processFolder(folderPath,
     return torch.Tensor(np.transpose(np.array(gestTensor),(1,0,2,3)))
 
 
-class scut(torch.utils.data.Dataset):
+class scutDataset(torch.utils.data.Dataset):
 
     """
     Dataset class for SCUT-DHGA
@@ -77,6 +77,9 @@ class scut(torch.utils.data.Dataset):
         self.dataDir = dataDir # Path to the data directory
         self.mode = mode # mode: ['train','val','test']
         self.splitSize = splitSize # splitSize
+
+        assert not(self.mode == 'val' and self.splitSize == 0.0), "No validation split"
+
         self.numFrames = numFrames # Total frames to be used
         self.numGestures = 6 # Total number of gestures
         self.sample = sample # Perform sampling is sample=1
@@ -91,8 +94,8 @@ class scut(torch.utils.data.Dataset):
             numInstances = 10
             for subject_id in range(numSubjects):    
                 for gesture_id in range(self.numGestures):
-                    for instance_id in range(int(numInstances-splitSize*numInstances)): # Train spli
-                        folderName = self.dataDir + '1_1_'+str(subject_id)+'_'+str(gesture_id)+'_'+str(instance_id) # Name of the folder
+                    for instance_id in range(int(numInstances-splitSize*numInstances)): # Train split
+                        folderName = self.dataDir + '/1_1_'+str(subject_id)+'_'+str(gesture_id)+'_'+str(instance_id)+'/' # Name of the folder
                         self.folderList.append(folderName)
                         self.y_id.append(subject_id)
                         self.y_gid.append(gesture_id)  
@@ -105,7 +108,7 @@ class scut(torch.utils.data.Dataset):
             for subject_id in range(numSubjects):    
                 for gesture_id in range(self.numGestures):
                     for instance_id in range(int(numInstances-splitSize*numInstances),numInstances): # Validation split
-                        folderName = self.dataDir + '1_1_'+str(subject_id)+'_'+str(gesture_id)+'_'+str(instance_id) # Name of the folder
+                        folderName = self.dataDir + '/1_1_'+str(subject_id)+'_'+str(gesture_id)+'_'+str(instance_id) # Name of the folder
                         self.folderList.append(folderName)
                         self.y_id.append(subject_id)
                         self.y_gid.append(gesture_id)
@@ -118,9 +121,9 @@ class scut(torch.utils.data.Dataset):
             numInstances = 10
             for subject_id in range(numSubjects):
                 for gesture_id in range(self.numGestures):
-                    for session_id in range(numSessions):
+                    for session_id in range(1,1+numSessions):
                         for instance_id in range(numInstances):
-                            folderName = self.dataDir + '2_'+str(session_id)+'_'+str(subject_id)+'_'+str(gesture_id)+'_'+str(instance_id) # Name of the folder
+                            folderName = self.dataDir + '/2_'+str(session_id)+'_'+str(subject_id)+'_'+str(gesture_id)+'_'+str(instance_id) # Name of the folder
                             self.folderList.append(folderName)
                             self.y_id.append(subject_id)
                             self.y_gid.append(gesture_id)
@@ -134,14 +137,14 @@ class scut(torch.utils.data.Dataset):
                                                         random_state=42) # shuffling
     
     def __len__(self):
-        return len(os.listdir(self.dataDir))
+        return len(self.folderList)
     
     def __getitem__(self, idx):
         return {'data':processFolder(self.folderList[idx],
                                      numFrames=self.numFrames,
                                      sample=self.sample,
                                      sampleMethod=self.samplingMethod),
-                'label':torch.tensor(self.y_id).type(torch.LongTensor)}
+                'label':torch.tensor(self.y_id[idx]).type(torch.LongTensor)}
         
 
 if __name__ == "__main__":
@@ -158,4 +161,27 @@ if __name__ == "__main__":
     # print(gestTensor.numpy())
     # print(torch.max(gestTensor).item(),torch.min(gestTensor).item())
 
+    dataset = scutDataset(dataDir='./datasets/scut/scut/color_hand',
+                          mode='train',
+                          splitSize=0.2,
+                          numFrames=64,
+                          sample=1,
+                          sampleMethod='sample'
+                          )
+    print(dataset.__len__())
+
+    device = torch.device('cuda:0')
+
+    dataLoader = torch.utils.data.DataLoader(dataset,
+                                             batch_size=128,
+                                             shuffle=True,
+                                             drop_last=False)
     
+    for batch_idx, data in enumerate(dataLoader):
+        print(data['data'].to(device).size(),
+              data['label'].to(device).size())
+        print(data['label'].detach().cpu().numpy())
+        
+    # for i in range(10):
+    #     data = dataset.__getitem__(i)
+    #     print(data['data'].shape, data['label'].item())
