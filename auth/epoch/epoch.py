@@ -70,7 +70,7 @@ def val_epoch(dataloader,
 
     return loss_id/total_samples, acc_id/total_samples
 
-def train_val(train_loader,
+def trainVal(train_loader,
               val_loader,
               model, 
               optimizer, 
