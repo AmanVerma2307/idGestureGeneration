@@ -278,7 +278,7 @@ class Model_MSBANet(torch.nn.Module):
 if __name__ == "__main__":
 
     device = torch.device('cuda:0')
-    model = Model_MSBANet(64,
+    model = Model_MSBANet(20,
                           512,
                           128).to(device)
     input = (torch.randn(2,3,64,200,200).permute(0,2,1,3,4)).reshape(-1, 3, 200, 200).to(device)
