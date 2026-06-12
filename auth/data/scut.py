@@ -19,7 +19,8 @@ def processFrame(img_path):
     return (frame-np.min(frame,axis=(1,2),keepdims=True))/(np.max(frame,axis=(1,2),keepdims=True)-np.min(frame,axis=(1,2),keepdims=True))
 
 def processFolder(folderPath,
-                  numFrames,
+                  numFrames=64,
+                  sample=0,
                   sampleMethod='continuous'):
 
     """
@@ -27,8 +28,9 @@ def processFolder(folderPath,
 
     INPUTS:-
     1) folderPath: Path to the folder
-    2) numFrames: Total number of frames in the input video
-    3) sampleMethod: Sampling method
+    2) numFrames: Total number of frames in the input video (Default fixed @ 64 frames)
+    3) sample: If 1 then sampling, else full video
+    4) sampleMethod: Sampling method
 
     OUTPUTS:-
     1) gestTensor: Torch tensor of shape [3 x numFrames x 200 x 200]
@@ -37,18 +39,23 @@ def processFolder(folderPath,
     gestTensor = []
     totalFrames = 64 # Total number of frames
 
-    if(sampleMethod == 'continuous'):
+    if(sample == 0):
         for frameIdx, frameName in enumerate(sorted(os.listdir(folderPath))):
-            if((frameIdx+1)<=numFrames):
-                gestTensor.append(processFrame(folderPath+'/'+frameName))
+            gestTensor.append(processFrame(folderPath+'/'+frameName))
 
-    if(sampleMethod == 'sample'):
-        frameNames = sorted(os.listdir(folderPath))
-        frameNumbers = list(np.int32(np.round(np.linspace(0,totalFrames-1,numFrames))))
+    if(sample == 1):
+        if(sampleMethod == 'continuous'):
+            for frameIdx, frameName in enumerate(sorted(os.listdir(folderPath))):
+                if((frameIdx+1)<=numFrames):
+                    gestTensor.append(processFrame(folderPath+'/'+frameName))
 
-        for idx in range(totalFrames):
-            if(idx in frameNumbers):
-                gestTensor.append(processFrame(folderPath+'/'+frameNames[idx]))
+        if(sampleMethod == 'sample'):
+            frameNames = sorted(os.listdir(folderPath))
+            frameNumbers = list(np.int32(np.round(np.linspace(0,totalFrames-1,numFrames))))
+
+            for idx in range(totalFrames):
+                if(idx in frameNumbers):
+                    gestTensor.append(processFrame(folderPath+'/'+frameNames[idx]))
 
     return torch.Tensor(np.transpose(np.array(gestTensor),(1,0,2,3)))
 
@@ -63,13 +70,17 @@ class scut(torch.utils.data.Dataset):
                  dataDir='./datasets/scut/color_hand/',
                  mode='train',
                  splitSize=0.2,
-                 frameCount=64):
+                 numFrames=64,
+                 sample=0,
+                 sampleMethod='sample'):
         
         self.dataDir = dataDir # Path to the data directory
         self.mode = mode # mode: ['train','val','test']
         self.splitSize = splitSize # splitSize
-        self.frameCount = frameCount # Total frames to be used
+        self.numFrames = numFrames # Total frames to be used
         self.numGestures = 6 # Total number of gestures
+        self.sample = sample # Perform sampling is sample=1
+        self.samplingMethod = sampleMethod # Sampling method, default: 'sample'
 
         self.folderList = [] # List to store path of data folders
         self.y_id = [] # List to store subject IDs
@@ -125,6 +136,13 @@ class scut(torch.utils.data.Dataset):
     def __len__(self):
         return len(os.listdir(self.dataDir))
     
+    def __getitem__(self, idx):
+        return {'data':processFolder(self.folderList[idx],
+                                     numFrames=self.numFrames,
+                                     sample=self.sample,
+                                     sampleMethod=self.samplingMethod),
+                'label':torch.tensor(self.y_id).type(torch.LongTensor)}
+        
 
 if __name__ == "__main__":
 
@@ -135,7 +153,9 @@ if __name__ == "__main__":
     # plt.imshow(np.transpose(img,(1,2,0)))
     # plt.show()
 
-    gestTensor = processFolder('./datasets/scut/scut/color_hand/1_1_0_0_0',numFrames=16,sampleMethod='sample')
-    print(gestTensor.shape)
+    # gestTensor = processFolder('./datasets/scut/scut/color_hand/1_1_0_0_0',numFrames=16,sampleMethod='sample')
+    # print(gestTensor.shape)
     # print(gestTensor.numpy())
-    print(torch.max(gestTensor).item(),torch.min(gestTensor).item())
+    # print(torch.max(gestTensor).item(),torch.min(gestTensor).item())
+
+    
