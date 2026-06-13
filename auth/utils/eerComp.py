@@ -1,10 +1,5 @@
-'''
-@Description: Calculate equal error rate
-@Date: 2019-11-27 21:29:36
-@LastEditors: lxy
-@LastEditTime: 2019-11-28 10:07:10
-'''
 import numpy as np
+import matplotlib.pyplot as plt
 from scipy.spatial import distance
 from sklearn.preprocessing import normalize
 
@@ -60,16 +55,15 @@ def calculate_eer(probe,
     min_errors_idx = np.argmin(np.asarray(errors))
     eerVal = (FRRs[min_errors_idx] + FARs[min_errors_idx]) / 2
     bestThresh = thresholds[min_errors_idx]
-
     return eerVal, bestThresh
 
 if __name__ == "__main__":
 
-    probe = np.random.normal(size=(100,32))
-    gallery = np.random.normal(size=(100,32))
+    probe = np.random.normal(size=(10000,32))
+    gallery = np.random.normal(size=(10000,32))
     
-    probeLabel = np.random.randint(0,10,size=(100,))
-    galleryLabel = np.random.randint(0,10,size=(100,))
+    probeLabel = np.random.randint(0,10,size=(10000,))
+    galleryLabel = np.random.randint(0,10,size=(10000,))
 
     eerVal, bestThresh = calculate_eer(probe,
                                        gallery,

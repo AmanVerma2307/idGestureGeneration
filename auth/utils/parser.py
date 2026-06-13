@@ -102,6 +102,15 @@ def parse():
                         default=0.2,
                         help="ViViT dropout rate")
     
+    #### Test arguments
+    parser.add_argument('--resultFileInit',
+                        type=int,
+                        default=0,
+                        help="If True, then a new result file is initiated")
+    parser.add_argument('--resultFileName',
+                        type=str,
+                        help="Name of the result file")
+    
     args = parser.parse_args()
     return args
     

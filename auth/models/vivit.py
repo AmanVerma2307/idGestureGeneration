@@ -400,13 +400,16 @@ class res3dViViT(torch.nn.Module):
         dense_id = self.dense_id(f_theta)
         return dense_id, f_theta
     
-    def predict(self,dataLoader):
+    def predict(self,
+                dataLoader,
+                args):
 
         """
         Function to predict embeddings and outputs
 
         INPUTS:-
         1) dataLoader: The testSet loader with N samples
+        2) args: Parsed arguments
 
         OUPUTS:-
         1) y_preds: Predicted labels of shape (N,)
@@ -414,7 +417,10 @@ class res3dViViT(torch.nn.Module):
         """
 
         y_preds = []
-        f_theta = []
+        embeddings = []
+        
+        if(args.multi_gpu == 0):
+            device = torch.device(args.device)
 
         for batch_idx, dataSample in enumerate(tqdm.tqdm(dataLoader,colour='yellow')):
 
@@ -427,9 +433,9 @@ class res3dViViT(torch.nn.Module):
             
             for elemPreds, elemEmbeddings in zip(torch.argmax(dense_id,dim=-1).detach().cpu().numpy(),f_theta.detach().cpu().numpy()):
                 y_preds.append(elemPreds)
-                f_theta.append(elemEmbeddings)                
+                embeddings.append(elemEmbeddings)                
 
-        return np.array(y_preds), np.array(f_theta)
+        return np.array(y_preds), np.array(embeddings)
 
 ###### Model summaries
 

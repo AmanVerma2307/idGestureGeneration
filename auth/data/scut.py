@@ -155,8 +155,10 @@ class scutDataset(torch.utils.data.Dataset):
                                      sample=self.sample,
                                      sampleMethod=self.samplingMethod),
                 'label':torch.tensor(self.y_id[idx]).type(torch.LongTensor)}
+    
+    def __getLabels__(self):
+        return np.array(self.y_id), np.array(self.y_gid)
         
-
 if __name__ == "__main__":
 
     # import matplotlib.pyplot as plt
