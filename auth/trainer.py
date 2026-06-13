@@ -15,7 +15,8 @@ torch.cuda.manual_seed(seed)
 random.seed(seed)
 np.random.seed(seed)
 
-wandb.init(project='idGestureGeneration',name=args.exp_name)
+wandb.init(project='idGestureAuth',
+           name=args.exp_name)
 
 if(args.multi_gpu == 0):
     device = torch.device(args.device)
@@ -36,7 +37,7 @@ if(args.dataset == 'scut'):
     H = 200
     W = 200
     C = 3
-    d_model = args.d_model
+    I = 143
 
 
 trainLoader = torch.utils.data.DataLoader(trainDataset,
@@ -45,10 +46,15 @@ trainLoader = torch.utils.data.DataLoader(trainDataset,
                                           drop_last=False)
 valLoader = torch.utils.data.DataLoader(valDataset,
                                         batch_size=args.batch_size,
-                                        shuffle=True,
+                                        shuffle=False,
                                         drop_last=False)
 
-model = getModel(args, T, H, W, C)
+model = getModel(args, 
+                 T, 
+                 H, 
+                 W, 
+                 C, 
+                 I)
 model.to(device)
 
 criterion_id = torch.nn.CrossEntropyLoss()
@@ -64,5 +70,5 @@ train_metrics, val_metrics = trainVal(trainLoader,
                                       args)
 
 ##### Saving
-np.savez_compressed('./_store/_history/'+args.exp_name+'_trainMetrics.npz',np.array(train_metrics))
-np.savez_compressed('./_store/_history/'+args.exp_name+'_valMetrics.npz',np.array(val_metrics))
+np.savez_compressed('./auth/_store/_history/'+args.exp_name+'_trainMetrics.npz',np.array(train_metrics))
+np.savez_compressed('./auth/_store/_history/'+args.exp_name+'_valMetrics.npz',np.array(val_metrics))

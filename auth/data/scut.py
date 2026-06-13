@@ -65,7 +65,6 @@ def processFolder(folderPath,
             for idx in frameNumbers:
                 gestTensor.append(processFrame(folderPath+'/'+frameNames[idx]))
 
-
     return torch.Tensor(np.transpose(np.array(gestTensor),(1,0,2,3)))
 
 
@@ -76,7 +75,7 @@ class scutDataset(torch.utils.data.Dataset):
     """
 
     def __init__(self,
-                 dataDir='./datasets/scut/color_hand/',
+                 dataDir='./datasets/scut/scut/color_hand',
                  mode='train',
                  splitSize=0.2,
                  numFrames=64,
@@ -110,8 +109,8 @@ class scutDataset(torch.utils.data.Dataset):
                         self.folderList.append(folderName)
                         self.y_id.append(subject_id)
                         self.y_gid.append(gesture_id)  
-                print('++++++++++++++++++++++++++')
-                print('Processed Train Subject #: '+str(subject_id+1))
+                # print('++++++++++++++++++++++++++')
+                # print('Processed Train Subject #: '+str(subject_id+1))
 
         if(self.mode == 'val'):
             numSubjects = 143
@@ -123,8 +122,8 @@ class scutDataset(torch.utils.data.Dataset):
                         self.folderList.append(folderName)
                         self.y_id.append(subject_id)
                         self.y_gid.append(gesture_id)
-                print('++++++++++++++++++++++++++')
-                print('Processed Validation Subject #: '+str(subject_id+1))
+                # print('++++++++++++++++++++++++++')
+                # print('Processed Validation Subject #: '+str(subject_id+1))
 
         if(self.mode == 'test'):
             numSubjects = 50
@@ -137,14 +136,15 @@ class scutDataset(torch.utils.data.Dataset):
                         self.folderList.append(folderName)
                         self.y_id.append(subject_id)
                         self.y_gid.append(gesture_id)
-                print('++++++++++++++++++++++++++')
-                print('Processed Test Subject #: '+str(subject_id+1))
+                # print('++++++++++++++++++++++++++')
+                # print('Processed Test Subject #: '+str(subject_id+1))
 
 
-        self.folderList, self.y_id, self.y_gid = shuffle(self.folderList,
-                                                        self.y_id,
-                                                        self.y_gid,
-                                                        random_state=42) # shuffling
+        if(self.mode != 'test'):
+            self.folderList, self.y_id, self.y_gid = shuffle(self.folderList,
+                                                            self.y_id,
+                                                            self.y_gid,
+                                                            random_state=42) # shuffling
     
     def __len__(self):
         return len(self.folderList)
@@ -171,7 +171,7 @@ if __name__ == "__main__":
     # print(gestTensor.numpy())
     # print(torch.max(gestTensor).item(),torch.min(gestTensor).item())
 
-    dataset = scutDataset(dataDir='./datasets/scut/scut/color_hand',
+    dataset = scutDataset(dataDir='./datasets/scut/color_hand',
                           mode='test',
                           splitSize=0.2,
                           numFrames=64,

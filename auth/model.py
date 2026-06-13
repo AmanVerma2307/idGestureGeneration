@@ -1,19 +1,20 @@
 import torch
-from auth.models.vivit import *
-from auth.models.msba import *
+from models.vivit import *
+from models.msba import *
 
 def getModel(args,
              T,
              H,
              W,
-             C):
+             C,
+             I):
     """
     Function to get model
     """
 
     if(args.modelChoice == 'vivit'):
         model = res3dViViT(input_dim=args.input_dim,
-                           patch_size=[args.pathSizeT,args.patchSizeH,args.patchSizeW],
+                           patch_size=[args.patchSizeT,args.patchSizeH,args.patchSizeW],
                            T=T,
                            H=H,
                            W=W,
@@ -22,11 +23,18 @@ def getModel(args,
                            num_heads=args.numHeads,
                            dff=args.dff,
                            rate=args.vivit_rate,
-                           num_encoders=args.numEncoders)
+                           num_encoders=args.numEncoders,
+                           I=I)
         
     if(args.modelChoice == 'msba'):
         model = Model_MSBANet(frame_length=T,
                               feature_dim=512,
                               out_dim=128)
+        
+    total_params = sum(p.numel() for p in model.parameters())
+    print('++++++++++++++++++')
+    print('Model: '+str(args.modelChoice))
+    print('Total parameters: '+str(total_params)) 
+    print('++++++++++++++++++')
 
     return model

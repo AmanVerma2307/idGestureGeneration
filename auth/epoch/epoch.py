@@ -15,7 +15,7 @@ def train_epoch(dataloader,
     """
 
     loss_id = 0.0
-    acc_hgr = 0.0
+    acc_id = 0.0
     total_samples = 0.0
 
     for batch_idx, dataSample in enumerate(tqdm.tqdm(dataloader,colour='blue')):
@@ -50,7 +50,7 @@ def val_epoch(dataloader,
     """
 
     loss_id = 0.0
-    acc_hgr = 0.0
+    acc_id = 0.0
     total_samples = 0.0
 
     for batch_idx, dataSample in enumerate(tqdm.tqdm(dataloader,colour='green')):
@@ -81,7 +81,7 @@ def trainVal(train_loader,
     Function to train and validate in a single GPU setting
     """
 
-    model_path = './_store/_weights/'+args.exp_name+'.pth'
+    model_path = './auth/_store/_weights/'+args.exp_name+'.pth'
     loss_best = 1e+6
     device = torch.device(args.device)
 
