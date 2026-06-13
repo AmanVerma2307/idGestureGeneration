@@ -5,33 +5,46 @@
 @LastEditTime: 2019-11-28 10:07:10
 '''
 import numpy as np
+from scipy.spatial import distance
+from sklearn.preprocessing import normalize
 
-def calculate_eer(features1, features2, pair_labels, useCosin):
-    assert(features1.shape == features2.shape)
+def calculate_eer(probe, 
+                  gallery, 
+                  probeLabels, 
+                  galleryLabels, 
+                  useCosine=1):
 
-    # linear
-    if(len(features1.shape) <= 2):
-        if(useCosin):
-            # cosin distances
-            distances = 1 - np.sum(features1 * features2, axis=1) / (np.linalg.norm(features1, axis=1) * np.linalg.norm(features2, axis=1))
-        else:
-            # euclidean distances
-            distances = np.sqrt(np.sum((features1 - features2) ** 2, axis=1))
+    """
+    Function to compute EER
 
-    # time distributed
+    INPUTS:-
+    1) probe: Probe embeddings of shape (N,d)
+    2) gallery: Gallery embeddings of shape (M,d)
+    3) probeLabels: ID labels for probe, shape -> (N,)
+    4) galleryLabels: ID labels for gallery, shape -> (M,) 
+    5) useCosine: If 1, then cosine distance is used as the distance metric
+
+    OUTPUTS:-
+    1) eerVal: Computed EER value
+    2) bestThresh: Best value of threshold (i.e., the value at which EER is minimum)
+    """
+
+    probe = normalize(probe)
+    gallery = normalize(gallery) 
+
+    if(useCosine == 1):
+        distVec = distance.cdist(probe,gallery,metric='cosine')
     else:
-        if(useCosin):
-            # cosin distances
-            distances = np.mean(1 - np.sum(features1 * features2, axis=2) / (np.linalg.norm(features1, axis=2) * np.linalg.norm(features2, axis=2)), axis=1)
-        else:
-            # euclidean distances
-            distances = np.mean(np.sqrt(np.sum((features1 - features2) ** 2, axis=2)), axis=1)
+        distVec = distance.cdist(probe,gallery,metric='euclidean')
 
-    min_dis = np.min(distances)
-    max_dis = np.max(distances)
+    distVec = np.ravel(distVec)
+    labelVec = np.ravel(np.expand_dims(probeLabels,-1) == np.expand_dims(galleryLabels,0))
 
-    accept_distances = distances[pair_labels == True]
-    reject_distances = distances[pair_labels == False]
+    min_dis = np.min(distVec)
+    max_dis = np.max(distVec)
+
+    accept_distances = distVec[labelVec == True]
+    reject_distances = distVec[labelVec == False]
 
     FARs = []
     FRRs = []
@@ -45,7 +58,22 @@ def calculate_eer(features1, features2, pair_labels, useCosin):
         FARs.append(FAR)
         errors.append(abs(FAR - FRR))
     min_errors_idx = np.argmin(np.asarray(errors))
-    EER = (FRRs[min_errors_idx] + FARs[min_errors_idx]) / 2
-    best_thres = thresholds[min_errors_idx]
+    eerVal = (FRRs[min_errors_idx] + FARs[min_errors_idx]) / 2
+    bestThresh = thresholds[min_errors_idx]
 
-    return EER, best_thres
+    return eerVal, bestThresh
+
+if __name__ == "__main__":
+
+    probe = np.random.normal(size=(100,32))
+    gallery = np.random.normal(size=(100,32))
+    
+    probeLabel = np.random.randint(0,10,size=(100,))
+    galleryLabel = np.random.randint(0,10,size=(100,))
+
+    eerVal, bestThresh = calculate_eer(probe,
+                                       gallery,
+                                       probeLabel,
+                                       galleryLabel,
+                                       useCosine=0)
+    print(eerVal, bestThresh)
