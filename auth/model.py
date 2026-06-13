@@ -6,22 +6,21 @@ def getModel(args,
              T,
              H,
              W,
-             C,
-             input_dim):
+             C):
     """
     Function to get model
     """
 
     if(args.modelChoice == 'vivit'):
-        model = res3dViViT(input_dim=input_dim,
+        model = res3dViViT(input_dim=args.input_dim,
                            patch_size=[args.pathSizeT,args.patchSizeH,args.patchSizeW],
                            T=T,
                            H=H,
                            W=W,
                            C=C,
                            d_model=args.d_model,
-                           num_heads=args.num_heads,
-                           dff=2*args.d_model,
+                           num_heads=args.numHeads,
+                           dff=args.dff,
                            rate=args.vivit_rate,
                            num_encoders=args.numEncoders)
         

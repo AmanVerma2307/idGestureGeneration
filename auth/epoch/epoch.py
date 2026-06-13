@@ -41,9 +41,9 @@ def train_epoch(dataloader,
     return loss_id/total_samples, acc_id/total_samples
 
 def val_epoch(dataloader, 
-                model,  
-                obj_id,
-                device):
+              model,  
+              obj_id,
+              device):
     
     """
     Function to test the netwok on a single epoch
@@ -81,7 +81,7 @@ def trainVal(train_loader,
     Function to train and validate in a single GPU setting
     """
 
-    model_path = './models/'+args.exp_name+'.pth'
+    model_path = './_store/_weights/'+args.exp_name+'.pth'
     loss_best = 1e+6
     device = torch.device(args.device)
 

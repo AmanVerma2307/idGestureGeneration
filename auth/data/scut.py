@@ -55,9 +55,16 @@ def processFolder(folderPath,
             frameNames = sorted(os.listdir(folderPath))
             frameNumbers = list(np.int32(np.round(np.linspace(0,totalFrames-1,numFrames))))
 
-            for idx in range(totalFrames):
-                if(idx in frameNumbers):
-                    gestTensor.append(processFrame(folderPath+'/'+frameNames[idx]))
+            for idx in frameNumbers:
+                gestTensor.append(processFrame(folderPath+'/'+frameNames[idx]))
+                
+        if(sampleMethod == 'random'):
+            frameNames = sorted(os.listdir(folderPath))
+            frameNumbers = sorted(list(np.random.randint(0,totalFrames,size=(numFrames,))))
+
+            for idx in frameNumbers:
+                gestTensor.append(processFrame(folderPath+'/'+frameNames[idx]))
+
 
     return torch.Tensor(np.transpose(np.array(gestTensor),(1,0,2,3)))
 
