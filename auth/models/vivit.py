@@ -1,4 +1,6 @@
+import tqdm
 import torch
+import numpy as np
 
 class MHSA(torch.nn.Module):
     
@@ -397,6 +399,37 @@ class res3dViViT(torch.nn.Module):
         # dense_hgr = self.dense_hgr(f_theta)
         dense_id = self.dense_id(f_theta)
         return dense_id, f_theta
+    
+    def predict(self,dataLoader):
+
+        """
+        Function to predict embeddings and outputs
+
+        INPUTS:-
+        1) dataLoader: The testSet loader with N samples
+
+        OUPUTS:-
+        1) y_preds: Predicted labels of shape (N,)
+        2) f_theta: Predicted embeddings of shape (N,d)
+        """
+
+        y_preds = []
+        f_theta = []
+
+        for batch_idx, dataSample in enumerate(tqdm.tqdm(dataLoader,colour='yellow')):
+
+            x = dataSample['data'].to(device)
+            y_id = dataSample['label'].to(device)
+
+            self.eval()
+            with torch.set_grad_enabled(False):
+                dense_id, f_theta = self.forward(x)
+            
+            for elemPreds, elemEmbeddings in zip(torch.argmax(dense_id,dim=-1).detach().cpu().numpy(),f_theta.detach().cpu().numpy()):
+                y_preds.append(elemPreds)
+                f_theta.append(elemEmbeddings)                
+
+        return np.array(y_preds), np.array(f_theta)
 
 ###### Model summaries
 

@@ -241,7 +241,7 @@ class Model_MSBANet(torch.nn.Module):
         #     data = data.cuda()
         #     if label is not None:
         #         label = label.cuda()
-        # data = data.view((-1,)+data.shape[-3:])
+        data = data.view((-1,)+data.shape[-3:])
 
         feature = self.model.conv1(data)
         feature = self.model.bn1(feature)
@@ -278,10 +278,11 @@ class Model_MSBANet(torch.nn.Module):
 if __name__ == "__main__":
 
     device = torch.device('cuda:0')
-    model = Model_MSBANet(20,
+    model = Model_MSBANet(60,
                           512,
                           128).to(device)
-    input = (torch.randn(2,3,64,200,200).permute(0,2,1,3,4)).reshape(-1, 3, 200, 200).to(device)
+    input = torch.randn(2, 60, 3, 200, 200).view(-1,3,200,200).to(device)
+    # input = torch.randn(2,3,64,200,200).to(device)
     op = model.forward(input)
     print(op.shape)
     

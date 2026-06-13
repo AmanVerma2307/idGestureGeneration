@@ -4,6 +4,7 @@ import numpy as np
 import skimage.io as skio
 from sklearn.utils import shuffle
 
+
 def processFrame(img_path):
 
     """
@@ -17,6 +18,7 @@ def processFrame(img_path):
     """
     frame = np.transpose(skio.imread(img_path),(2,0,1))
     return (frame-np.min(frame,axis=(1,2),keepdims=True))/(np.max(frame,axis=(1,2),keepdims=True)-np.min(frame,axis=(1,2),keepdims=True))
+
 
 def processFolder(folderPath,
                   numFrames=64,
@@ -72,7 +74,8 @@ class scutDataset(torch.utils.data.Dataset):
                  splitSize=0.2,
                  numFrames=64,
                  sample=0,
-                 sampleMethod='sample'):
+                 sampleMethod='sample',
+                 sessionID=1):
         
         self.dataDir = dataDir # Path to the data directory
         self.mode = mode # mode: ['train','val','test']
@@ -84,6 +87,7 @@ class scutDataset(torch.utils.data.Dataset):
         self.numGestures = 6 # Total number of gestures
         self.sample = sample # Perform sampling is sample=1
         self.samplingMethod = sampleMethod # Sampling method, default: 'sample'
+        self.sessionID = sessionID # Session ID for the test set
 
         self.folderList = [] # List to store path of data folders
         self.y_id = [] # List to store subject IDs
@@ -117,16 +121,15 @@ class scutDataset(torch.utils.data.Dataset):
 
         if(self.mode == 'test'):
             numSubjects = 50
-            numSessions = 2
             numInstances = 10
             for subject_id in range(numSubjects):
                 for gesture_id in range(self.numGestures):
-                    for session_id in range(1,1+numSessions):
-                        for instance_id in range(numInstances):
-                            folderName = self.dataDir + '/2_'+str(session_id)+'_'+str(subject_id)+'_'+str(gesture_id)+'_'+str(instance_id) # Name of the folder
-                            self.folderList.append(folderName)
-                            self.y_id.append(subject_id)
-                            self.y_gid.append(gesture_id)
+                    # for session_id in range(1,1+numSessions):
+                    for instance_id in range(numInstances):
+                        folderName = self.dataDir + '/2_'+str(self.sessionID)+'_'+str(subject_id)+'_'+str(gesture_id)+'_'+str(instance_id) # Name of the folder
+                        self.folderList.append(folderName)
+                        self.y_id.append(subject_id)
+                        self.y_gid.append(gesture_id)
                 print('++++++++++++++++++++++++++')
                 print('Processed Test Subject #: '+str(subject_id+1))
 
@@ -162,18 +165,19 @@ if __name__ == "__main__":
     # print(torch.max(gestTensor).item(),torch.min(gestTensor).item())
 
     dataset = scutDataset(dataDir='./datasets/scut/scut/color_hand',
-                          mode='train',
+                          mode='test',
                           splitSize=0.2,
                           numFrames=64,
-                          sample=1,
-                          sampleMethod='sample'
+                          sample=0,
+                          sampleMethod='sample',
+                          sessionID=2
                           )
     print(dataset.__len__())
 
     device = torch.device('cuda:0')
 
     dataLoader = torch.utils.data.DataLoader(dataset,
-                                             batch_size=128,
+                                             batch_size=8,
                                              shuffle=True,
                                              drop_last=False)
     

@@ -2,10 +2,10 @@ import wandb
 import random
 import torch
 import numpy as np
-from auth.model import getModel
-from auth.epoch import trainVal
-from auth.utils.parser import *
-from auth.data.scut import *
+from model import getModel
+from epoch.epoch import trainVal
+from utils.parser import *
+from data.scut import *
 
 args = parse()
 
