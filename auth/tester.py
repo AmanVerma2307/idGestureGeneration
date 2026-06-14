@@ -55,13 +55,19 @@ if(args.multi_gpu == 0):
 _, gallery = model.predict(torch.utils.data.DataLoader(gallery,
                                                        batch_size=args.batch_size,
                                                        shuffle=False,
-                                                       drop_last=False),
+                                                       drop_last=False,
+                                                       num_workers=args.numWorkers,
+                                                       pin_memory=True,
+                                                       prefetch_factor=args.preFetchFactor),
                                                        args)
 
 _, probe = model.predict(torch.utils.data.DataLoader(probe,
                                                      batch_size=args.batch_size,
                                                      shuffle=False,
-                                                     drop_last=False),
+                                                     drop_last=False,
+                                                     num_workers=args.numWorkers,
+                                                     pin_memory=True,
+                                                     prefetch_factor=args.preFetchFactor),
                                                      args)
 
 eerVal, bestThresh = calculate_eer(probe,

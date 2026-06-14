@@ -43,11 +43,17 @@ if(args.dataset == 'scut'):
 trainLoader = torch.utils.data.DataLoader(trainDataset,
                                           batch_size=args.batch_size,
                                           shuffle=True,
-                                          drop_last=False)
+                                          drop_last=False,
+                                          num_workers=args.numWorkers,
+                                          pin_memory=True,
+                                          prefetch_factor=args.preFetchFactor)
 valLoader = torch.utils.data.DataLoader(valDataset,
                                         batch_size=args.batch_size,
                                         shuffle=False,
-                                        drop_last=False)
+                                        drop_last=False,
+                                        num_workers=args.numWorkers,
+                                        pin_memory=True,
+                                        prefetch_factor=args.preFetchFactor)
 
 model = getModel(args, 
                  T, 

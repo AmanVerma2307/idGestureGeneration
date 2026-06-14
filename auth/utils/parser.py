@@ -17,6 +17,14 @@ def parse():
                         type=str,
                         default='cuda:0',
                         help="Device to be used in single gpu setting")
+    parser.add_argument('--numWorkers',
+                        type=int,
+                        default=0,
+                        help="Number of sub-workers to be used in dataloaders")
+    parser.add_argument('--preFetchFactor',
+                        type=int,
+                        default=2,
+                        help="Number of batches to sample apriori")        
 
     #### Dataset arguments
     parser.add_argument('--dataset',
