@@ -3,7 +3,7 @@ import torch
 import numpy as np
 import skimage.io as skio
 from sklearn.utils import shuffle
-
+from skimage.transform import resize
 
 def processFrame(img_path):
 
@@ -16,7 +16,7 @@ def processFrame(img_path):
     OUTPUTS:-
     1) frame: Preprocessed image of Dimensions - (3x200x200)
     """
-    frame = np.transpose(skio.imread(img_path),(2,0,1))
+    frame = np.transpose(resize(skio.imread(img_path),(128,128)),(2,0,1))
     return (frame-np.min(frame,axis=(1,2),keepdims=True))/(np.max(frame,axis=(1,2),keepdims=True)-np.min(frame,axis=(1,2),keepdims=True))
 
 

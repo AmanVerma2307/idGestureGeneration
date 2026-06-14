@@ -34,8 +34,8 @@ if(args.dataset == 'scut'):
                             sampleMethod=args.sampleMethod)
     
     T = args.numFrames
-    H = 200
-    W = 200
+    H = 128
+    W = 128
     C = 3
     I = 143
 

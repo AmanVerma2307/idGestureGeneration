@@ -33,8 +33,8 @@ if(args.dataset == 'scut'):
     probeLabels, _ = probe.__getLabels__()
     
     T = args.numFrames
-    H = 200
-    W = 200
+    H = 128
+    W = 128
     C = 3
     I = 143
 
@@ -77,7 +77,7 @@ measureVal = [str(args.exp_name),
 
 print('===============================')
 print('EER Value: '+str(round(eerVal,2)))
-print('EER Value: '+str(round(bestThresh,2)))
+print('Best threshold: '+str(round(bestThresh,2)))
 
 if(args.resultFileInit == 1):
     resultFile = open('./auth/_store/_resultFiles/'+args.resultFileName+'.txt','w')
