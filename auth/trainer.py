@@ -56,6 +56,7 @@ model = getModel(args,
                  C, 
                  I)
 model.to(device)
+print(next(model.backbone.parameters()).device)
 
 criterion_id = torch.nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(),lr=args.lr)
