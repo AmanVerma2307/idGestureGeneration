@@ -1,4 +1,5 @@
 import os
+import time
 import torch
 import numpy as np
 import skimage.io as skio
@@ -106,7 +107,10 @@ class scutDataset(torch.utils.data.Dataset):
                 for gesture_id in range(self.numGestures):
                     for instance_id in range(int(numInstances-splitSize*numInstances)): # Train split
                         folderName = self.dataDir + '/1_1_'+str(subject_id)+'_'+str(gesture_id)+'_'+str(instance_id)+'/' # Name of the folder
-                        self.folderList.append(folderName)
+                        self.folderList.append(processFolder(folderName,
+                                                             numFrames=self.numFrames,
+                                                             sample=self.sample,
+                                                             sampleMethod=self.samplingMethod))
                         self.y_id.append(subject_id)
                         self.y_gid.append(gesture_id)  
                 # print('++++++++++++++++++++++++++')
@@ -119,7 +123,10 @@ class scutDataset(torch.utils.data.Dataset):
                 for gesture_id in range(self.numGestures):
                     for instance_id in range(int(numInstances-splitSize*numInstances),numInstances): # Validation split
                         folderName = self.dataDir + '/1_1_'+str(subject_id)+'_'+str(gesture_id)+'_'+str(instance_id) # Name of the folder
-                        self.folderList.append(folderName)
+                        self.folderList.append(processFolder(folderName,
+                                                             numFrames=self.numFrames,
+                                                             sample=self.sample,
+                                                             sampleMethod=self.samplingMethod))
                         self.y_id.append(subject_id)
                         self.y_gid.append(gesture_id)
                 # print('++++++++++++++++++++++++++')
@@ -133,7 +140,10 @@ class scutDataset(torch.utils.data.Dataset):
                     # for session_id in range(1,1+numSessions):
                     for instance_id in range(numInstances):
                         folderName = self.dataDir + '/2_'+str(self.sessionID)+'_'+str(subject_id)+'_'+str(gesture_id)+'_'+str(instance_id) # Name of the folder
-                        self.folderList.append(folderName)
+                        self.folderList.append(processFolder(folderName,
+                                                             numFrames=self.numFrames,
+                                                             sample=self.sample,
+                                                             sampleMethod=self.samplingMethod))
                         self.y_id.append(subject_id)
                         self.y_gid.append(gesture_id)
                 # print('++++++++++++++++++++++++++')
@@ -150,10 +160,7 @@ class scutDataset(torch.utils.data.Dataset):
         return len(self.folderList)
     
     def __getitem__(self, idx):
-        return {'data':processFolder(self.folderList[idx],
-                                     numFrames=self.numFrames,
-                                     sample=self.sample,
-                                     sampleMethod=self.samplingMethod),
+        return {'data':self.folderList[idx],
                 'label':torch.tensor(self.y_id[idx]).type(torch.LongTensor)}
     
     def __getLabels__(self):
@@ -181,19 +188,22 @@ if __name__ == "__main__":
                           sampleMethod='sample',
                           sessionID=2
                           )
+        
     print(dataset.__len__())
-
     device = torch.device('cuda:0')
+
 
     dataLoader = torch.utils.data.DataLoader(dataset,
                                              batch_size=8,
                                              shuffle=True,
-                                             drop_last=False)
+                                             drop_last=False,
+                                             )
     
     for batch_idx, data in enumerate(dataLoader):
-        print(data['data'].to(device).size(),
-              data['label'].to(device).size())
-        print(data['label'].detach().cpu().numpy())
+        if(batch_idx < 2):
+            print(data['data'].to(device).size(),
+                data['label'].to(device).size())
+            print(data['label'].detach().cpu().numpy())
         
     # for i in range(10):
     #     data = dataset.__getitem__(i)
