@@ -23,7 +23,7 @@ def parse():
                         help="Number of sub-workers to be used in dataloaders")
     parser.add_argument('--preFetchFactor',
                         type=int,
-                        default=2,
+                        default=0,
                         help="Number of batches to sample apriori")        
 
     #### Dataset arguments
@@ -47,6 +47,14 @@ def parse():
                         type=int,
                         default=64,
                         help="Number of frames to be sampled")
+    parser.add_argument('--sizeH',
+                        type=int,
+                        default=128,
+                        help="Height of the input")
+    parser.add_argument('--sizeW',
+                        type=int,
+                        default=128,
+                        help="Width of the input")
     
     #### Training arguments
     parser.add_argument('--batch_size',

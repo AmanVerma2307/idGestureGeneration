@@ -34,8 +34,8 @@ if(args.dataset == 'scut'):
                             sampleMethod=args.sampleMethod)
     
     T = args.numFrames
-    H = 128
-    W = 128
+    H = args.sizeH
+    W = args.sizeW
     C = 3
     I = 143
 
@@ -44,16 +44,12 @@ trainLoader = torch.utils.data.DataLoader(trainDataset,
                                           batch_size=args.batch_size,
                                           shuffle=True,
                                           drop_last=False,
-                                          num_workers=args.numWorkers,
-                                          pin_memory=True,
-                                          prefetch_factor=args.preFetchFactor)
+                                          pin_memory=True)
 valLoader = torch.utils.data.DataLoader(valDataset,
                                         batch_size=args.batch_size,
                                         shuffle=False,
                                         drop_last=False,
-                                        num_workers=args.numWorkers,
-                                        pin_memory=True,
-                                        prefetch_factor=args.preFetchFactor)
+                                        pin_memory=True)
 
 model = getModel(args, 
                  T, 
@@ -62,7 +58,6 @@ model = getModel(args,
                  C, 
                  I)
 model.to(device)
-print(next(model.backbone.parameters()).device)
 
 criterion_id = torch.nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(),lr=args.lr)

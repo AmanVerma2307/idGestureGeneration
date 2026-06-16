@@ -33,8 +33,8 @@ if(args.dataset == 'scut'):
     probeLabels, _ = probe.__getLabels__()
     
     T = args.numFrames
-    H = 128
-    W = 128
+    H = args.sizeH
+    W = args.sizeW
     C = 3
     I = 143
 
@@ -56,18 +56,14 @@ _, gallery = model.predict(torch.utils.data.DataLoader(gallery,
                                                        batch_size=args.batch_size,
                                                        shuffle=False,
                                                        drop_last=False,
-                                                       num_workers=args.numWorkers,
-                                                       pin_memory=True,
-                                                       prefetch_factor=args.preFetchFactor),
+                                                       pin_memory=True),
                                                        args)
 
 _, probe = model.predict(torch.utils.data.DataLoader(probe,
                                                      batch_size=args.batch_size,
                                                      shuffle=False,
                                                      drop_last=False,
-                                                     num_workers=args.numWorkers,
-                                                     pin_memory=True,
-                                                     prefetch_factor=args.preFetchFactor),
+                                                     pin_memory=True),
                                                      args)
 
 eerVal, bestThresh = calculate_eer(probe,
