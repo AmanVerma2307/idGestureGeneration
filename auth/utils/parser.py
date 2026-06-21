@@ -5,6 +5,10 @@ def parse():
     parser = argparse.ArgumentParser()
 
     #### General arguments
+    parser.add_argument('--reproducibility',
+                        type=int,
+                        default=1,
+                        help="If 1, then random seeding")
     parser.add_argument('--seed',
                         type=int,
                         default=42,

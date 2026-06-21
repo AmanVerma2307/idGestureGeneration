@@ -9,11 +9,12 @@ from data.scut import *
 
 args = parse()
 
-seed = args.seed
-torch.manual_seed(seed)
-torch.cuda.manual_seed(seed)
-random.seed(seed)
-np.random.seed(seed)
+if(args.reproducibility == 1):
+    seed = args.seed
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    random.seed(seed)
+    np.random.seed(seed)
 
 wandb.init(project='idGestureAuth',
            name=args.exp_name)
@@ -26,12 +27,16 @@ if(args.dataset == 'scut'):
                             splitSize=args.valSplit,
                             numFrames=args.numFrames,
                             sample=args.sample,
-                            sampleMethod=args.sampleMethod)
+                            sampleMethod=args.sampleMethod,
+                            H=args.sizeH,
+                            W=args.sizeW)
     valDataset = scutDataset(mode='val',
                             splitSize=args.valSplit,
                             numFrames=args.numFrames,
                             sample=args.sample,
-                            sampleMethod=args.sampleMethod)
+                            sampleMethod=args.sampleMethod,
+                            H=args.sizeH,
+                            W=args.sizeW)
     
     T = args.numFrames
     H = args.sizeH

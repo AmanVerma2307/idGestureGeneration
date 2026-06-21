@@ -8,11 +8,12 @@ from data.scut import *
 
 args = parse()
 
-torch.manual_seed(args.seed)
-torch.cuda.manual_seed(args.seed)
-torch.cuda.manual_seed_all(args.seed)
-random.seed(args.seed)
-np.random.seed(args.seed)
+if(args.reproducibility == 1):
+    torch.manual_seed(args.seed)
+    torch.cuda.manual_seed(args.seed)
+    torch.cuda.manual_seed_all(args.seed)
+    random.seed(args.seed)
+    np.random.seed(args.seed)
 
 if(args.dataset == 'scut'):
 
@@ -21,7 +22,8 @@ if(args.dataset == 'scut'):
                           numFrames=args.numFrames,
                           sample=args.sample,
                           sampleMethod=args.sampleMethod,
-                          sessionID=1)
+                          sessionID=1,
+                          H=args.sizeH)
     galleryLabels, _ = gallery.__getLabels__()
 
     probe = scutDataset(mode='test',
@@ -29,7 +31,8 @@ if(args.dataset == 'scut'):
                         numFrames=args.numFrames,
                         sample=args.sample,
                         sampleMethod=args.sampleMethod,
-                        sessionID=2)
+                        sessionID=2,
+                        W=args.sizeW)
     probeLabels, _ = probe.__getLabels__()
     
     T = args.numFrames
@@ -74,12 +77,12 @@ eerVal, bestThresh = calculate_eer(probe,
 
 measure = ['model', 'eerVal', 'bestThresh']
 measureVal = [str(args.exp_name),
-              str(round(eerVal,2)),
-              str(round(bestThresh,2))]
+              str(round(eerVal,4)),
+              str(round(bestThresh,4))]
 
 print('===============================')
-print('EER Value: '+str(round(eerVal,2)))
-print('Best threshold: '+str(round(bestThresh,2)))
+print('EER Value: '+str(round(eerVal,4)))
+print('Best threshold: '+str(round(bestThresh,4)))
 
 if(args.resultFileInit == 1):
     resultFile = open('./auth/_store/_resultFiles/'+args.resultFileName+'.txt','w')

@@ -5,7 +5,9 @@ import skimage.io as skio
 from sklearn.utils import shuffle
 from skimage.transform import resize
 
-def processFrame(img_path):
+def processFrame(img_path, 
+                 H=128, 
+                 W=128):
 
     """
     Function to Read the Frame and Preprocess them.
@@ -14,16 +16,21 @@ def processFrame(img_path):
     1) img_path: Path to the image
 
     OUTPUTS:-
-    1) frame: Preprocessed image of Dimensions - (3x200x200)
+    1) frame: Preprocessed image of Dimensions - (3xHxW)
     """
-    frame = np.transpose(resize(skio.imread(img_path),(128,128)),(2,0,1))
+    if(H != 200 and W != 200):
+        frame = np.transpose(resize(skio.imread(img_path),(H,W)),(2,0,1))
+    else:
+        frame = np.transpose(skio.imread(img_path),(2,0,1))
     return (frame-np.min(frame,axis=(1,2),keepdims=True))/(np.max(frame,axis=(1,2),keepdims=True)-np.min(frame,axis=(1,2),keepdims=True))
 
 
 def processFolder(folderPath,
                   numFrames=64,
                   sample=0,
-                  sampleMethod='continuous'):
+                  sampleMethod='continuous',
+                  H=128,
+                  W=128):
 
     """
     Function to process entire gesture sample stored inside a folder
@@ -43,27 +50,34 @@ def processFolder(folderPath,
 
     if(sample == 0):
         for frameIdx, frameName in enumerate(sorted(os.listdir(folderPath))):
-            gestTensor.append(processFrame(folderPath+'/'+frameName))
+            gestTensor.append(processFrame(folderPath+'/'+frameName,H=H,W=W))
 
     if(sample == 1):
         if(sampleMethod == 'continuous'):
             for frameIdx, frameName in enumerate(sorted(os.listdir(folderPath))):
                 if((frameIdx+1)<=numFrames):
-                    gestTensor.append(processFrame(folderPath+'/'+frameName))
+                    gestTensor.append(processFrame(folderPath+'/'+frameName,H=H,W=W))
 
         if(sampleMethod == 'sample'):
             frameNames = sorted(os.listdir(folderPath))
             frameNumbers = list(np.int32(np.round(np.linspace(0,totalFrames-1,numFrames))))
 
             for idx in frameNumbers:
-                gestTensor.append(processFrame(folderPath+'/'+frameNames[idx]))
+                gestTensor.append(processFrame(folderPath+'/'+frameNames[idx],H=H,W=W))
                 
         if(sampleMethod == 'random'):
             frameNames = sorted(os.listdir(folderPath))
-            frameNumbers = sorted(list(np.random.randint(0,totalFrames,size=(numFrames,))))
+            frameNumbers = sorted(list(np.random.randint(0,totalFrames,size=(numFrames,),)))
 
             for idx in frameNumbers:
-                gestTensor.append(processFrame(folderPath+'/'+frameNames[idx]))
+                gestTensor.append(processFrame(folderPath+'/'+frameNames[idx],H=H,W=W))
+
+        if(sampleMethod == 'randomOrder'):
+            frameNames = sorted(os.listdir(folderPath))
+            frameNumbers = list(np.random.randint(0,totalFrames,size=(numFrames,)))
+
+            for idx in frameNumbers:
+                gestTensor.append(processFrame(folderPath+'/'+frameNames[idx],H=H,W=W))
 
     return torch.Tensor(np.transpose(np.array(gestTensor),(1,0,2,3)))
 
@@ -81,7 +95,9 @@ class scutDataset(torch.utils.data.Dataset):
                  numFrames=64,
                  sample=0,
                  sampleMethod='sample',
-                 sessionID=1):
+                 sessionID=1,
+                 H=128,
+                 W=128):
         
         self.dataDir = dataDir # Path to the data directory
         self.mode = mode # mode: ['train','val','test']
@@ -94,6 +110,8 @@ class scutDataset(torch.utils.data.Dataset):
         self.sample = sample # Perform sampling is sample=1
         self.samplingMethod = sampleMethod # Sampling method, default: 'sample'
         self.sessionID = sessionID # Session ID for the test set
+        self.H = H # Height of the rescaled input frame
+        self.W = W # Width of the rescaled input frame
 
         self.folderList = [] # List to store path of data folders
         self.y_id = [] # List to store subject IDs
@@ -109,7 +127,9 @@ class scutDataset(torch.utils.data.Dataset):
                         self.folderList.append(processFolder(folderName,
                                                              numFrames=self.numFrames,
                                                              sample=self.sample,
-                                                             sampleMethod=self.samplingMethod))
+                                                             sampleMethod=self.samplingMethod,
+                                                             H=self.H,
+                                                             W=self.W))
                         self.y_id.append(subject_id)
                         self.y_gid.append(gesture_id)  
                 # print('++++++++++++++++++++++++++')
@@ -125,7 +145,9 @@ class scutDataset(torch.utils.data.Dataset):
                         self.folderList.append(processFolder(folderName,
                                                              numFrames=self.numFrames,
                                                              sample=self.sample,
-                                                             sampleMethod=self.samplingMethod))
+                                                             sampleMethod=self.samplingMethod,
+                                                             H=self.H,
+                                                             W=self.W))
                         self.y_id.append(subject_id)
                         self.y_gid.append(gesture_id)
                 # print('++++++++++++++++++++++++++')
@@ -142,7 +164,9 @@ class scutDataset(torch.utils.data.Dataset):
                         self.folderList.append(processFolder(folderName,
                                                              numFrames=self.numFrames,
                                                              sample=self.sample,
-                                                             sampleMethod=self.samplingMethod))
+                                                             sampleMethod=self.samplingMethod,
+                                                             H=self.H,
+                                                             W=self.W))
                         self.y_id.append(subject_id)
                         self.y_gid.append(gesture_id)
                 # print('++++++++++++++++++++++++++')
@@ -185,7 +209,9 @@ if __name__ == "__main__":
                           numFrames=64,
                           sample=0,
                           sampleMethod='sample',
-                          sessionID=2
+                          sessionID=2,
+                          H=128,
+                          W=128
                           )
         
     print(dataset.__len__())
