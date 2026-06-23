@@ -2,6 +2,7 @@ import torch
 from models.vivit import *
 from models.msba import *
 from models.resnet import *
+from models.i3d import *
 
 def getModel(args,
              T,
@@ -33,7 +34,10 @@ def getModel(args,
                               out_dim=128)
         
     if(args.modelChoice == 'resnet18'):
-            model = resnet18Video(I)
+        model = resnet18Video(I)
+
+    if(args.modelChoice == 'i3d'):
+         model = i3d(I)
         
     total_params = sum(p.numel() for p in model.parameters())
     print('++++++++++++++++++')

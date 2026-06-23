@@ -13,6 +13,10 @@ def parse():
                         type=int,
                         default=42,
                         help="Random seed to ensure reproducibility")
+    parser.add_argument('--trackMetrics',
+                        type=int,
+                        default=1,
+                        help="If 1, then metrics will be tracked with wandb")
     parser.add_argument('--multi_gpu',
                         type=int,
                         default=0,

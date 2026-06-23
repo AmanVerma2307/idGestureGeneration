@@ -16,8 +16,9 @@ if(args.reproducibility == 1):
     random.seed(seed)
     np.random.seed(seed)
 
-wandb.init(project='idGestureAuth',
-           name=args.exp_name)
+if(args.trackMetrics == 1):
+    wandb.init(project='idGestureAuth',
+            name=args.exp_name)
 
 if(args.multi_gpu == 0):
     device = torch.device(args.device)

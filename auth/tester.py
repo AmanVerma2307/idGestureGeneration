@@ -23,7 +23,8 @@ if(args.dataset == 'scut'):
                           sample=args.sample,
                           sampleMethod=args.sampleMethod,
                           sessionID=1,
-                          H=args.sizeH)
+                          H=args.sizeH,
+                          W=args.sizeW)
     galleryLabels, _ = gallery.__getLabels__()
 
     probe = scutDataset(mode='test',
@@ -32,6 +33,7 @@ if(args.dataset == 'scut'):
                         sample=args.sample,
                         sampleMethod=args.sampleMethod,
                         sessionID=2,
+                        H=args.sizeH,
                         W=args.sizeW)
     probeLabels, _ = probe.__getLabels__()
     
