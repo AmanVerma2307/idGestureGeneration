@@ -4,3 +4,4 @@ auth/_store
 auth/wandb/
 wandb/
 auth/_run
+auth/utils/testCase.ipynb
