@@ -1,7 +1,6 @@
 import tqdm
 import timm
 import torch
-import torchvision
 import numpy as np
 
 class resnet18Video(torch.nn.Module):
