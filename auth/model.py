@@ -3,6 +3,7 @@ from models.vivit import *
 from models.msba import *
 from models.resnet import *
 from models.i3d import *
+from models.fstanet import *
 
 def getModel(args,
              T,
@@ -36,9 +37,9 @@ def getModel(args,
     if(args.modelChoice == 'resnet18'):
         model = resnet18Video(I)
 
-    if(args.modelChoice == 'i3d'):
-         model = i3d(I)
-        
+    if(args.modelChoice == 'fstanet'):
+         model = fsta(T,I)
+
     total_params = sum(p.numel() for p in model.parameters())
     print('++++++++++++++++++')
     print('Model: '+str(args.modelChoice))
