@@ -37,8 +37,14 @@ def getModel(args,
     if(args.modelChoice == 'resnet18'):
         model = resnet18Video(I)
 
+    if(args.modelChoice == 'i3d'):
+         model = i3d(I)
+
     if(args.modelChoice == 'fstanet'):
          model = fsta(T,I)
+
+    if(args.modelChoice == 'videomae'):
+         model = fsta(I)
 
     total_params = sum(p.numel() for p in model.parameters())
     print('++++++++++++++++++')
