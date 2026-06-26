@@ -4,6 +4,7 @@ from models.msba import *
 from models.resnet import *
 from models.i3d import *
 from models.fstanet import *
+from models.videomae import *
 
 def getModel(args,
              T,
@@ -44,11 +45,12 @@ def getModel(args,
          model = fsta(T,I)
 
     if(args.modelChoice == 'videomae'):
-         model = fsta(I)
+         model = videomae(I)
 
     total_params = sum(p.numel() for p in model.parameters())
     print('++++++++++++++++++')
     print('Model: '+str(args.modelChoice))
+    print(model)
     print('Total parameters: '+str(total_params)) 
     print('++++++++++++++++++')
 
