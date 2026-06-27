@@ -358,6 +358,7 @@ def get_videomaeModel(modelStyle="B"):
 
     return model
 
+@register_model
 class videomae(torch.nn.Module):
     
     def __init__(self,

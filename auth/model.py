@@ -45,7 +45,7 @@ def getModel(args,
          model = fsta(T,I)
 
     if(args.modelChoice == 'videomae'):
-         model = videomae(I)
+         model = videomae(I,modelStyle="B")
 
     total_params = sum(p.numel() for p in model.parameters())
     print('++++++++++++++++++')
