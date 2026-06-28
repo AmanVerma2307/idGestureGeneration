@@ -135,6 +135,29 @@ def parse():
                         type=str,
                         help="Name of the result file")
     
+    #### Transformations
+    parser.add_argument('--applyTransforms',
+                        type=int,
+                        default=0,
+                        help="If True, then transformations are applied")
+    parser.add_argument('--transformMode',
+                        type=str,
+                        default='elastic',
+                        help="Specifies which transformation to be applied. Default set: elastic")
+    parser.add_argument('--elasticTx_alpha',
+                        type=int,
+                        default=100,
+                        help="Alpha parameter of the elastic transform")
+    parser.add_argument('--blur_kernelSize',
+                        type=int,
+                        default=5,
+                        help="Mean of the Gaussian kernel")
+    parser.add_argument('--blur_sigma',
+                        type=float,
+                        default=1.0,
+                        help="Variance of the Gaussian kernel")
+
+
     args = parser.parse_args()
     return args
     

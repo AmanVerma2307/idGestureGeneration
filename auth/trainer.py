@@ -5,6 +5,7 @@ import numpy as np
 from model import getModel
 from epoch.epoch import trainVal
 from utils.parser import *
+from utils.transforms import *
 from data.scut import *
 
 args = parse()
@@ -30,14 +31,16 @@ if(args.dataset == 'scut'):
                             sample=args.sample,
                             sampleMethod=args.sampleMethod,
                             H=args.sizeH,
-                            W=args.sizeW)
+                            W=args.sizeW,
+                            transform=getTransforms(args))
     valDataset = scutDataset(mode='val',
                             splitSize=args.valSplit,
                             numFrames=args.numFrames,
                             sample=args.sample,
                             sampleMethod=args.sampleMethod,
                             H=args.sizeH,
-                            W=args.sizeW)
+                            W=args.sizeW,
+                            transform=getTransforms(args))
     
     T = args.numFrames
     H = args.sizeH

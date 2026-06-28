@@ -30,7 +30,8 @@ def processFolder(folderPath,
                   sample=0,
                   sampleMethod='continuous',
                   H=128,
-                  W=128):
+                  W=128,
+                  transform=None):
 
     """
     Function to process entire gesture sample stored inside a folder
@@ -40,9 +41,12 @@ def processFolder(folderPath,
     2) numFrames: Total number of frames in the input video (Default fixed @ 64 frames)
     3) sample: If 1 then sampling, else full video
     4) sampleMethod: Sampling method
+    5) H: Resizing height
+    6) W: Resizing width
+    7) transform: Transformation to be applied over frames
 
     OUTPUTS:-
-    1) gestTensor: Torch tensor of shape [3 x numFrames x 200 x 200]
+    1) gestTensor: Torch tensor of shape [3 x numFrames x 200 x 200] (Channel as the first dimension)
     """
 
     gestTensor = []
@@ -79,7 +83,10 @@ def processFolder(folderPath,
             for idx in frameNumbers:
                 gestTensor.append(processFrame(folderPath+'/'+frameNames[idx],H=H,W=W))
 
-    return torch.Tensor(np.transpose(np.array(gestTensor),(1,0,2,3)))
+    if(transform == None):
+        return torch.Tensor(np.transpose(np.array(gestTensor),(1,0,2,3)))
+    else:
+        return transform(torch.Tensor(np.array(gestTensor))).permute(1,0,2,3)
 
 
 class scutDataset(torch.utils.data.Dataset):
@@ -97,7 +104,8 @@ class scutDataset(torch.utils.data.Dataset):
                  sampleMethod='sample',
                  sessionID=1,
                  H=128,
-                 W=128):
+                 W=128,
+                 transform=None):
         
         self.dataDir = dataDir # Path to the data directory
         self.mode = mode # mode: ['train','val','test']
@@ -112,6 +120,7 @@ class scutDataset(torch.utils.data.Dataset):
         self.sessionID = sessionID # Session ID for the test set
         self.H = H # Height of the rescaled input frame
         self.W = W # Width of the rescaled input frame
+        self.transform = transform
 
         self.folderList = [] # List to store path of data folders
         self.y_id = [] # List to store subject IDs
@@ -129,7 +138,8 @@ class scutDataset(torch.utils.data.Dataset):
                                                              sample=self.sample,
                                                              sampleMethod=self.samplingMethod,
                                                              H=self.H,
-                                                             W=self.W))
+                                                             W=self.W,
+                                                             transform=self.transform))
                         self.y_id.append(subject_id)
                         self.y_gid.append(gesture_id)  
                 # print('++++++++++++++++++++++++++')
@@ -147,7 +157,8 @@ class scutDataset(torch.utils.data.Dataset):
                                                              sample=self.sample,
                                                              sampleMethod=self.samplingMethod,
                                                              H=self.H,
-                                                             W=self.W))
+                                                             W=self.W,
+                                                             transform=self.transform))
                         self.y_id.append(subject_id)
                         self.y_gid.append(gesture_id)
                 # print('++++++++++++++++++++++++++')
@@ -166,7 +177,8 @@ class scutDataset(torch.utils.data.Dataset):
                                                              sample=self.sample,
                                                              sampleMethod=self.samplingMethod,
                                                              H=self.H,
-                                                             W=self.W))
+                                                             W=self.W,
+                                                             transform=self.transform))
                         self.y_id.append(subject_id)
                         self.y_gid.append(gesture_id)
                 # print('++++++++++++++++++++++++++')

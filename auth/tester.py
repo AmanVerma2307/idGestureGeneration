@@ -4,6 +4,7 @@ import numpy as np
 from model import getModel
 from utils.parser import *
 from utils.eerComp import *
+from utils.transforms import *
 from data.scut import *
 
 args = parse()
@@ -24,7 +25,8 @@ if(args.dataset == 'scut'):
                           sampleMethod=args.sampleMethod,
                           sessionID=1,
                           H=args.sizeH,
-                          W=args.sizeW)
+                          W=args.sizeW,
+                          transform=getTransforms(args))
     galleryLabels, _ = gallery.__getLabels__()
 
     probe = scutDataset(mode='test',
@@ -34,7 +36,8 @@ if(args.dataset == 'scut'):
                         sampleMethod=args.sampleMethod,
                         sessionID=2,
                         H=args.sizeH,
-                        W=args.sizeW)
+                        W=args.sizeW,
+                        transform=getTransforms(args))
     probeLabels, _ = probe.__getLabels__()
     
     T = args.numFrames
