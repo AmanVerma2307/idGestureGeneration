@@ -150,7 +150,7 @@ def parse():
                         help="Alpha parameter of the elastic transform")
     parser.add_argument('--blur_kernelSize',
                         type=int,
-                        default=5,
+                        default=11,
                         help="Mean of the Gaussian kernel")
     parser.add_argument('--blur_sigma',
                         type=float,
