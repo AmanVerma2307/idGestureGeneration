@@ -2,7 +2,7 @@ import wandb
 import random
 import torch
 import numpy as np
-from model import getModel
+from model import *
 from epoch.epoch import trainVal
 from utils.parser import *
 from utils.transforms import *
@@ -32,7 +32,8 @@ if(args.dataset == 'scut'):
                             sampleMethod=args.sampleMethod,
                             H=args.sizeH,
                             W=args.sizeW,
-                            transform=getTransforms(args))
+                            transform=getTransforms(args),
+                            motionModel=args.motionModel)
     valDataset = scutDataset(mode='val',
                             splitSize=args.valSplit,
                             numFrames=args.numFrames,
@@ -40,7 +41,8 @@ if(args.dataset == 'scut'):
                             sampleMethod=args.sampleMethod,
                             H=args.sizeH,
                             W=args.sizeW,
-                            transform=getTransforms(args))
+                            transform=getTransforms(args),
+                            motionModel=args.motionModel)
     
     T = args.numFrames
     H = args.sizeH
@@ -60,12 +62,15 @@ valLoader = torch.utils.data.DataLoader(valDataset,
                                         drop_last=False,
                                         pin_memory=True)
 
-model = getModel(args, 
-                 T, 
-                 H, 
-                 W, 
-                 C, 
-                 I)
+if(args.motionModel == 0):
+    model = getModel(args, 
+                    T, 
+                    H, 
+                    W, 
+                    C, 
+                    I)
+else:
+    model = motionModel(args,I)
 model.to(device)
 
 criterion_id = torch.nn.CrossEntropyLoss()

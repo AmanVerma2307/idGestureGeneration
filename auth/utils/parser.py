@@ -156,6 +156,16 @@ def parse():
                         type=float,
                         default=1.0,
                         help="Variance of the Gaussian kernel")
+    
+    #### MotionModel arguments
+    parser.add_argument('--motionModel',
+                        type=int,
+                        default=0,
+                        help="If True, then motion maps or input with different number of channels than 3 will be used.")
+    parser.add_argument('--motionModel_Cin',
+                        type=int,
+                        default=1,
+                        help="Total number of channels in the input for motionModel")
 
 
     args = parser.parse_args()

@@ -105,7 +105,8 @@ class scutDataset(torch.utils.data.Dataset):
                  sessionID=1,
                  H=128,
                  W=128,
-                 transform=None):
+                 transform=None,
+                 motionModel=0):
         
         self.dataDir = dataDir # Path to the data directory
         self.mode = mode # mode: ['train','val','test']
@@ -120,7 +121,8 @@ class scutDataset(torch.utils.data.Dataset):
         self.sessionID = sessionID # Session ID for the test set
         self.H = H # Height of the rescaled input frame
         self.W = W # Width of the rescaled input frame
-        self.transform = transform
+        self.transform = transform # If defined, then trasformations are to be applied
+        self.motionModel = motionModel # If high, then SCUT-DHGA motion maps are formed
 
         self.folderList = [] # List to store path of data folders
         self.y_id = [] # List to store subject IDs
@@ -133,13 +135,25 @@ class scutDataset(torch.utils.data.Dataset):
                 for gesture_id in range(self.numGestures):
                     for instance_id in range(int(numInstances-splitSize*numInstances)): # Train split
                         folderName = self.dataDir + '/1_1_'+str(subject_id)+'_'+str(gesture_id)+'_'+str(instance_id)+'/' # Name of the folder
-                        self.folderList.append(processFolder(folderName,
-                                                             numFrames=self.numFrames,
-                                                             sample=self.sample,
-                                                             sampleMethod=self.samplingMethod,
-                                                             H=self.H,
-                                                             W=self.W,
-                                                             transform=self.transform))
+
+                        if(self.motionModel == 0):
+                            self.folderList.append(processFolder(folderName,
+                                                                numFrames=self.numFrames,
+                                                                sample=self.sample,
+                                                                sampleMethod=self.samplingMethod,
+                                                                H=self.H,
+                                                                W=self.W,
+                                                                transform=self.transform))
+                        if(self.motionModel == 1):
+                            gestTensor = processFolder(folderName,
+                                                        numFrames=self.numFrames,
+                                                        sample=self.sample,
+                                                        sampleMethod=self.samplingMethod,
+                                                        H=self.H,
+                                                        W=self.W,
+                                                        transform=self.transform)
+                            self.folderList.append(torch.sum(gestTensor[:,1:,:,:] - gestTensor[:,:(self.numFrames-1),:,:],axis=0,keepdim=True))
+
                         self.y_id.append(subject_id)
                         self.y_gid.append(gesture_id)  
                 # print('++++++++++++++++++++++++++')
@@ -152,13 +166,25 @@ class scutDataset(torch.utils.data.Dataset):
                 for gesture_id in range(self.numGestures):
                     for instance_id in range(int(numInstances-splitSize*numInstances),numInstances): # Validation split
                         folderName = self.dataDir + '/1_1_'+str(subject_id)+'_'+str(gesture_id)+'_'+str(instance_id) # Name of the folder
-                        self.folderList.append(processFolder(folderName,
-                                                             numFrames=self.numFrames,
-                                                             sample=self.sample,
-                                                             sampleMethod=self.samplingMethod,
-                                                             H=self.H,
-                                                             W=self.W,
-                                                             transform=self.transform))
+                        
+                        if(self.motionModel == 0):
+                            self.folderList.append(processFolder(folderName,
+                                                                numFrames=self.numFrames,
+                                                                sample=self.sample,
+                                                                sampleMethod=self.samplingMethod,
+                                                                H=self.H,
+                                                                W=self.W,
+                                                                transform=self.transform))
+                        if(self.motionModel == 1):
+                            gestTensor = processFolder(folderName,
+                                                        numFrames=self.numFrames,
+                                                        sample=self.sample,
+                                                        sampleMethod=self.samplingMethod,
+                                                        H=self.H,
+                                                        W=self.W,
+                                                        transform=self.transform)
+                            self.folderList.append(torch.sum(gestTensor[:,1:,:,:] - gestTensor[:,:(self.numFrames-1),:,:],axis=0,keepdim=True))
+
                         self.y_id.append(subject_id)
                         self.y_gid.append(gesture_id)
                 # print('++++++++++++++++++++++++++')
@@ -172,13 +198,25 @@ class scutDataset(torch.utils.data.Dataset):
                     # for session_id in range(1,1+numSessions):
                     for instance_id in range(numInstances):
                         folderName = self.dataDir + '/2_'+str(self.sessionID)+'_'+str(subject_id)+'_'+str(gesture_id)+'_'+str(instance_id) # Name of the folder
-                        self.folderList.append(processFolder(folderName,
-                                                             numFrames=self.numFrames,
-                                                             sample=self.sample,
-                                                             sampleMethod=self.samplingMethod,
-                                                             H=self.H,
-                                                             W=self.W,
-                                                             transform=self.transform))
+                        
+                        if(self.motionModel == 0):
+                            self.folderList.append(processFolder(folderName,
+                                                                numFrames=self.numFrames,
+                                                                sample=self.sample,
+                                                                sampleMethod=self.samplingMethod,
+                                                                H=self.H,
+                                                                W=self.W,
+                                                                transform=self.transform))
+                        if(self.motionModel == 1):
+                            gestTensor = processFolder(folderName,
+                                                        numFrames=self.numFrames,
+                                                        sample=self.sample,
+                                                        sampleMethod=self.samplingMethod,
+                                                        H=self.H,
+                                                        W=self.W,
+                                                        transform=self.transform)
+                            self.folderList.append(torch.sum(gestTensor[:,1:,:,:] - gestTensor[:,:(self.numFrames-1),:,:],axis=0,keepdim=True))
+
                         self.y_id.append(subject_id)
                         self.y_gid.append(gesture_id)
                 # print('++++++++++++++++++++++++++')

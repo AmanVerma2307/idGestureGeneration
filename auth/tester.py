@@ -1,7 +1,7 @@
 import random
 import torch
 import numpy as np
-from model import getModel
+from model import *
 from utils.parser import *
 from utils.eerComp import *
 from utils.transforms import *
@@ -26,7 +26,8 @@ if(args.dataset == 'scut'):
                           sessionID=1,
                           H=args.sizeH,
                           W=args.sizeW,
-                          transform=getTransforms(args))
+                          transform=getTransforms(args),
+                          motionModel=args.motionModel)
     galleryLabels, _ = gallery.__getLabels__()
 
     probe = scutDataset(mode='test',
@@ -37,7 +38,8 @@ if(args.dataset == 'scut'):
                         sessionID=2,
                         H=args.sizeH,
                         W=args.sizeW,
-                        transform=getTransforms(args))
+                        transform=getTransforms(args),
+                        motionModel=args.motionModel)
     probeLabels, _ = probe.__getLabels__()
     
     T = args.numFrames
@@ -46,12 +48,17 @@ if(args.dataset == 'scut'):
     C = 3
     I = 143
 
-model = getModel(args, 
-                 T, 
-                 H, 
-                 W, 
-                 C, 
-                 I)
+
+if(args.motionModel == 0):
+    model = getModel(args, 
+                    T, 
+                    H, 
+                    W, 
+                    C, 
+                    I)
+else:
+    model = motionModel(args,I)
+
 model.load_state_dict(torch.load('./auth/_store/_weights/'+args.exp_name+'.pth', weights_only=True)) 
 model.eval()
 

@@ -67,11 +67,10 @@ class motionModel(torch.nn.Module):
 
     def __init__(self,
                  args,
-                 C,
                  I):
         
         super().__init__()
-        self.normConv = torch.nn.Conv3d(C,3,kernel_size=(3,3,3))
+        self.normConv = torch.nn.Conv3d(args.motionModel_Cin,3,kernel_size=(3,3,3))
         self.model = getModel(args,
                               T=args.numFrames-1,
                               H=args.sizeH,
@@ -113,7 +112,7 @@ class motionModel(torch.nn.Module):
             
             self.eval()
             with torch.set_grad_enabled(False):
-                dense_id, f_theta = self.forward(dataSample['label'].to(device))
+                dense_id, f_theta = self.forward(dataSample['data'].to(device))
 
             for elemPreds, elemEmbeddings in zip(torch.argmax(dense_id,dim=-1).detach().cpu().numpy(),f_theta.detach().cpu().numpy()):
                 y_preds.append(elemPreds)
